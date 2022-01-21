@@ -1,4 +1,4 @@
-const form = (function () {
+const form = (function form() {
   const formContainer = document.querySelector('form');
   const email = document.getElementById('email-input');
   const country = document.getElementById('country-input');
@@ -11,7 +11,7 @@ const form = (function () {
   };
 }());
 
-const formError = (function () {
+const formError = (function formError() {
   const countryError = document.querySelector('.country-error');
   const zipCodeError = document.querySelector('.code-error');
   const passwordError = document.querySelector('.password-error');
@@ -23,21 +23,88 @@ const formError = (function () {
   };
 }());
 
-const formListeners = (function () {
-  form.email.addEventListener('input', (event) => {
-    console.log(event);
+const displayError = (function displayError() {
+  const email = (element) => {
+    if (element.validity.valueMissing) {
+      formError.emailError.textContent = 'You need to enter and e-mail address';
+    } else if (element.validity.typeMismatch) {
+      formError.emailError.textContent = 'Entered value needs to be an email address';
+    }
+    formError.emailError.className = 'error active';
+  };
+
+  const country = (element) => {
+    if (element.validity.valueMissing) {
+      formError.countryError.textContent = 'You need to enter a country';
+    } else if (element.validity.tooShort) {
+      formError.countryError.textContent = `Country should be at least ${element.minLength} characters`;
+    } else if (element.validity.tooLong) {
+      formError.countryError.textContent = `Country should be no longer than ${element.maxLength} characters`;
+    }
+    formError.countryError.className = 'error active';
+  };
+
+  const zipCode = (element) => {
+    if (element.validity.valueMissing) {
+      formError.zipCodeError.textContent = 'You need to enter a Zipcode';
+    } else if (element.validity.tooLong) {
+      formError.zipCodeError.textContent = `Zipcode should be no longer than ${element.maxLength} characters`;
+    } else if (element.validity.patternMismatch) {
+      formError.zipCodeError.textContent = `${element.value} is not a valid Zipcode`;
+    }
+    if (element.validity.tooShort) {
+      formError.zipCodeError.textContent = `Zipcode should be at least ${element.minLength} characters`;
+    }
+    formError.zipCodeError.className = 'error active';
+  };
+  return { email, country, zipCode };
+}());
+
+const validateForm = (function validateForm() {
+  const validateEmail = (element) => {
+    if (element.validity.valid) {
+      formError.emailError.textContent = '';
+      formError.emailError.className = 'error';
+    } else {
+      displayError.email(element);
+    }
+  };
+
+  const validateCountry = (element) => {
+    if (element.validity.valid) {
+      formError.countryError.textContent = '';
+      formError.countryError.className = 'error';
+    } else {
+      displayError.country(element);
+    }
+  };
+
+  const validateZipcode = (element) => {
+    if (element.validity.valid) {
+      formError.zipCodeError.textContent = '';
+      formError.zipCodeError.className = 'error';
+    } else {
+      displayError.zipCode(element);
+    }
+  };
+  return { validateEmail, validateCountry, validateZipcode };
+}());
+
+(function formListeners() {
+  form.email.addEventListener('input', () => {
+    validateForm.validateEmail(form.email);
   });
 
-  form.country.addEventListener('input', (event) => {
-    console.log(event);
+  form.country.addEventListener('input', () => {
+    validateForm.validateCountry(form.country);
   });
 
-  form.zipCode.addEventListener('input', (event) => {
-    console.log(event);
+  form.zipCode.addEventListener('input', () => {
+    validateForm.validateZipcode(form.zipCode);
   });
 
-  form.password.addEventListener('input', (event) => {
-    console.log(event);
+  form.password.addEventListener('input', () => {
+    validateForm.validatePassword(form.password);
   });
 
   form.passwordConfirm.addEventListener('input', (event) => {
