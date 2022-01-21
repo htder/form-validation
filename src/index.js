@@ -80,11 +80,19 @@ const displayError = (function displayError() {
 }());
 
 const validateForm = (function validateForm() {
+  let emailValid = false;
+  let countryValid = false;
+  let zipValid = false;
+  let passwordValid = false;
+  let passwordConfirmValid = false;
+
   const validateEmail = (element) => {
     if (element.validity.valid) {
       formError.emailError.textContent = '';
       formError.emailError.className = 'error';
+      emailValid = true;
     } else {
+      emailValid = false;
       displayError.email(element);
     }
   };
@@ -93,7 +101,9 @@ const validateForm = (function validateForm() {
     if (element.validity.valid) {
       formError.countryError.textContent = '';
       formError.countryError.className = 'error';
+      countryValid = true;
     } else {
+      countryValid = false;
       displayError.country(element);
     }
   };
@@ -102,7 +112,9 @@ const validateForm = (function validateForm() {
     if (element.validity.valid) {
       formError.zipCodeError.textContent = '';
       formError.zipCodeError.className = 'error';
+      zipValid = true;
     } else {
+      zipValid = false;
       displayError.zipCode(element);
     }
   };
@@ -111,7 +123,9 @@ const validateForm = (function validateForm() {
     if (element.validity.valid) {
       formError.passwordError.textContent = '';
       formError.passwordError.className = 'error';
+      passwordValid = true;
     } else {
+      passwordValid = false;
       displayError.password(element);
     }
   };
@@ -120,13 +134,24 @@ const validateForm = (function validateForm() {
     if (confirm.value === passwordValue.value) {
       formError.passwordConfirmError.textContent = '';
       formError.passwordConfirmError.className = 'error';
+      passwordConfirmValid = true;
     } else {
-      displayError.passwordConfirm(confirm, passwordValue);
+      passwordConfirmValid = false;
+      displayError.passwordConfirm();
     }
   };
 
   return {
-    validateEmail, validateCountry, validateZipcode, validatePassword, validatePasswordConfirm,
+    validateEmail,
+    validateCountry,
+    validateZipcode,
+    validatePassword,
+    validatePasswordConfirm,
+    emailValid,
+    countryValid,
+    zipValid,
+    passwordValid,
+    passwordConfirmValid,
   };
 }());
 
@@ -152,7 +177,25 @@ const validateForm = (function validateForm() {
   });
 
   form.formContainer.addEventListener('submit', (event) => {
-    event.preventDefault();
-    console.log(event);
+    if (!validateForm.emailValid) {
+      validateForm.validateEmail(form.email);
+      event.preventDefault();
+    }
+    if (!validateForm.countryValid) {
+      validateForm.validateCountry(form.country);
+      event.preventDefault();
+    }
+    if (!validateForm.zipValid) {
+      validateForm.validateZipcode(form.zipCode);
+      event.preventDefault();
+    }
+    if (!validateForm.passwordValid) {
+      validateForm.validatePassword(form.password);
+      event.preventDefault();
+    }
+    if (!validateForm.passwordConfirmValid) {
+      validateForm.validatePasswordConfirm(form.passwordConfirm, form.password);
+      event.preventDefault();
+    }
   });
 }());
