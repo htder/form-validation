@@ -57,7 +57,26 @@ const displayError = (function displayError() {
     }
     formError.zipCodeError.className = 'error active';
   };
-  return { email, country, zipCode };
+
+  const password = (element) => {
+    if (element.validity.valueMissing) {
+      formError.passwordError.textContent = 'You need to enter a password';
+    } else if (element.validity.tooShort) {
+      formError.passwordError.textContent = `Your password should be at least ${element.minLength} characters`;
+    } else if (element.validity.tooLong) {
+      formError.passwordError.textContent = `You password should be no longer than ${element.maxLength} characters`;
+    }
+
+    formError.passwordError.className = 'error active';
+  };
+
+  const passwordConfirm = () => {
+    formError.passwordConfirmError.textContent = 'Passwords do not match';
+    formError.passwordConfirmError.className = 'error active';
+  };
+  return {
+    email, country, zipCode, password, passwordConfirm,
+  };
 }());
 
 const validateForm = (function validateForm() {
@@ -87,7 +106,28 @@ const validateForm = (function validateForm() {
       displayError.zipCode(element);
     }
   };
-  return { validateEmail, validateCountry, validateZipcode };
+
+  const validatePassword = (element) => {
+    if (element.validity.valid) {
+      formError.passwordError.textContent = '';
+      formError.passwordError.className = 'error';
+    } else {
+      displayError.password(element);
+    }
+  };
+
+  const validatePasswordConfirm = (confirm, passwordValue) => {
+    if (confirm.value === passwordValue.value) {
+      formError.passwordConfirmError.textContent = '';
+      formError.passwordConfirmError.className = 'error';
+    } else {
+      displayError.passwordConfirm(confirm, passwordValue);
+    }
+  };
+
+  return {
+    validateEmail, validateCountry, validateZipcode, validatePassword, validatePasswordConfirm,
+  };
 }());
 
 (function formListeners() {
@@ -107,8 +147,8 @@ const validateForm = (function validateForm() {
     validateForm.validatePassword(form.password);
   });
 
-  form.passwordConfirm.addEventListener('input', (event) => {
-    console.log(event);
+  form.passwordConfirm.addEventListener('input', () => {
+    validateForm.validatePasswordConfirm(form.passwordConfirm, form.password);
   });
 
   form.formContainer.addEventListener('submit', (event) => {
